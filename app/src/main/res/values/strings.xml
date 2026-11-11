@@ -6,4 +6,52 @@
     <string name="tab_chats">Чаты</string>
     <string name="tab_profile">Профиль</string>
     <string name="placeholder_coming_soon">Раздел появится на следующих этапах</string>
+
+    <string name="action_retry">Повторить</string>
+    <string name="action_sign_out">Выйти</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_back">Назад</string>
+
+    <string name="auth_tagline">Находите собеседников поблизости</string>
+    <string name="auth_email">Почта</string>
+    <string name="auth_password">Пароль</string>
+    <string name="auth_sign_in">Войти</string>
+    <string name="auth_sign_up">Зарегистрироваться</string>
+    <string name="auth_to_sign_up">Нет аккаунта? Зарегистрироваться</string>
+    <string name="auth_to_sign_in">Уже есть аккаунт? Войти</string>
+    <string name="auth_error_email">Введите корректную почту</string>
+    <string name="auth_error_password">Не короче %1$d символов</string>
+
+    <string name="profile_setup_title">Расскажите о себе</string>
+    <string name="profile_edit_title">Редактирование профиля</string>
+    <string name="profile_setup_hint">Это увидят люди рядом, когда вы включите видимость</string>
+    <string name="profile_name">Имя</string>
+    <string name="profile_birth_year">Год рождения</string>
+    <string name="profile_bio">О себе</string>
+    <string name="profile_interests">Интересы (до %1$d)</string>
+    <string name="profile_choose_photo">Выбрать фото</string>
+    <string name="profile_change_photo">Сменить фото</string>
+    <string name="profile_edit">Редактировать</string>
+    <string name="age_one">%1$d год</string>
+    <string name="age_few">%1$d года</string>
+    <string name="age_many">%1$d лет</string>
+    <string name="profile_no_bio">Вы пока ничего о себе не написали</string>
+    <string name="profile_error_name_empty">Введите имя</string>
+    <string name="profile_error_name_long">Не длиннее %1$d символов</string>
+    <string name="profile_error_year">Введите год рождения</string>
+    <string name="profile_error_underage">Приложение доступно с %1$d лет</string>
+    <string name="profile_error_bio_long">Не длиннее %1$d символов</string>
+
+    <string name="ban_title">Аккаунт отстранён</string>
+    <string name="ban_until">На вас поступили жалобы. Доступ вернётся %1$s.</string>
+    <string name="ban_permanent">На вас неоднократно поступали жалобы. Доступ закрыт навсегда.</string>
+    <string name="ban_check_again">Проверить снова</string>
+
+    <string name="error_network">Нет связи с сервером. Проверьте подключение.</string>
+    <string name="error_unknown">Что-то пошло не так. Попробуйте ещё раз.</string>
+    <string name="error_invalid_credentials">Неверная почта или пароль</string>
+    <string name="error_user_exists">Аккаунт с такой почтой уже есть</string>
+    <string name="error_weak_password">Пароль слишком простой</string>
+    <string name="error_banned">Аккаунт отстранён</string>
+    <string name="error_age_restricted">Приложение доступно с 18 лет</string>
 </resources>

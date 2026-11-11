@@ -1,61 +1,45 @@
 package com.coursework.nearby.presentation.navigation
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.coursework.nearby.presentation.placeholder.PlaceholderScreen
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.coursework.nearby.domain.model.AppState
+import com.coursework.nearby.presentation.auth.AuthScreen
+import com.coursework.nearby.presentation.ban.BanScreen
+import com.coursework.nearby.presentation.common.ErrorScreen
+import com.coursework.nearby.presentation.common.LoadingScreen
+import com.coursework.nearby.presentation.profile.ProfileEditScreen
+import com.coursework.nearby.presentation.root.RootViewModel
 
+/** Верхний уровень: какой из разделов приложения показывать при текущем состоянии аккаунта. */
 @Composable
-fun NearbyApp() {
-    val navController = rememberNavController()
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = backStackEntry?.destination
+fun NearbyApp(viewModel: RootViewModel = hiltViewModel()) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    Scaffold(
-        bottomBar = {
-            NavigationBar {
-                TopLevelDestination.entries.forEach { destination ->
-                    NavigationBarItem(
-                        selected = currentDestination?.hierarchy?.any { it.route == destination.route } == true,
-                        onClick = {
-                            navController.navigate(destination.route) {
-                                // Вкладки не накапливаются в стеке и сохраняют своё состояние.
-                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = { Icon(painterResource(destination.iconRes), contentDescription = null) },
-                        label = { Text(stringResource(destination.labelRes)) },
-                    )
-                }
-            }
-        },
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = TopLevelDestination.MAP.route,
-            modifier = Modifier.padding(innerPadding),
-        ) {
-            TopLevelDestination.entries.forEach { destination ->
-                composable(destination.route) {
-                    PlaceholderScreen(titleRes = destination.labelRes, iconRes = destination.iconRes)
-                }
-            }
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        when (val current = state) {
+            AppState.Loading -> LoadingScreen()
+            AppState.SignedOut -> AuthScreen(modifier = Modifier.safeDrawingPadding())
+            AppState.NeedsProfile -> ProfileEditScreen(
+                isSetup = true,
+                onDone = {},
+                onSignOut = viewModel::signOut,
+                modifier = Modifier.safeDrawingPadding(),
+            )
+            is AppState.Banned -> BanScreen(
+                state = current,
+                onCheckAgain = viewModel::retry,
+                onSignOut = viewModel::signOut,
+                modifier = Modifier.safeDrawingPadding(),
+            )
+            is AppState.Failed -> ErrorScreen(current.error, onRetry = viewModel::retry, onSignOut = viewModel::signOut)
+            is AppState.Ready -> MainTabs(profile = current.profile, onSignOut = viewModel::signOut)
         }
     }
 }
