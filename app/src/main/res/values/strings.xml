@@ -42,6 +42,23 @@
     <string name="profile_error_underage">Приложение доступно с %1$d лет</string>
     <string name="profile_error_bio_long">Не длиннее %1$d символов</string>
 
+    <string name="map_visibility">Видимость</string>
+    <string name="map_status_hidden">Вас никто не видит, и вы никого не видите</string>
+    <string name="map_status_no_permission">Нет доступа к геолокации — выключите и включите снова</string>
+    <string name="map_status_locating">Определяем местоположение…</string>
+    <string name="map_status_nobody">Вы видны. Рядом пока никого нет</string>
+    <string name="map_status_visible">Вы видны людям в вашем радиусе</string>
+    <string name="map_radius_km">%1$d км</string>
+    <string name="map_permission_title">Доступ к геолокации</string>
+    <string name="map_permission_text">Чтобы показать вас на карте людям рядом, приложению нужно ваше местоположение. На сервер передаётся только приблизительная точка с точностью около 200 метров, и только пока приложение открыто.</string>
+    <string name="map_permission_allow">Продолжить</string>
+    <string name="map_permission_later">Не сейчас</string>
+    <string name="card_start_chat">Начать общение</string>
+    <string name="card_request_sent">Запрос отправлен</string>
+    <string name="card_retry_in">Повторный запрос через %1$d ч</string>
+    <string name="card_incoming">Хочет пообщаться с вами. Ответить можно во вкладке «Запросы».</string>
+    <string name="card_already_chatting">Вы уже общаетесь. Чат — во вкладке «Чаты».</string>
+
     <string name="ban_title">Аккаунт отстранён</string>
     <string name="ban_until">На вас поступили жалобы. Доступ вернётся %1$s.</string>
     <string name="ban_permanent">На вас неоднократно поступали жалобы. Доступ закрыт навсегда.</string>
@@ -53,5 +70,10 @@
     <string name="error_user_exists">Аккаунт с такой почтой уже есть</string>
     <string name="error_weak_password">Пароль слишком простой</string>
     <string name="error_banned">Аккаунт отстранён</string>
+    <string name="error_out_of_range">Человек уже вне вашего общего радиуса</string>
+    <string name="error_user_unavailable">Пользователь сейчас недоступен</string>
+    <string name="error_cooldown">Повторный запрос пока недоступен</string>
+    <string name="error_request_unavailable">Запрос этому человеку недоступен</string>
+    <string name="error_already_pending">Запрос уже отправлен</string>
     <string name="error_age_restricted">Приложение доступно с 18 лет</string>
 </resources>

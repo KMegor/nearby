@@ -1,0 +1,81 @@
+package com.coursework.nearby.presentation.map
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.coursework.nearby.R
+import com.coursework.nearby.domain.model.NearbyUser
+import com.coursework.nearby.domain.model.Relation
+import com.coursework.nearby.presentation.common.Avatar
+import com.coursework.nearby.presentation.common.ageLabel
+import java.time.Duration
+import java.time.Instant
+
+/** Карточка человека с карты: профиль и действие, доступное при текущем отношении. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun UserCard(user: NearbyUser, isSending: Boolean, onSendRequest: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Avatar(model = user.avatarUrl, name = user.name, size = 72.dp)
+            Column {
+                Text(user.name, style = MaterialTheme.typography.titleLarge)
+                Text(ageLabel(user.age), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        if (user.bio.isNotEmpty()) Text(user.bio, style = MaterialTheme.typography.bodyLarge)
+        if (user.interests.isNotEmpty()) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                user.interests.forEach { SuggestionChip(onClick = {}, label = { Text(it) }) }
+            }
+        }
+
+        when (user.relation) {
+            Relation.NONE -> Button(onClick = onSendRequest, enabled = !isSending, modifier = Modifier.fillMaxWidth()) {
+                if (isSending) {
+                    CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                } else {
+                    Text(stringResource(R.string.card_start_chat))
+                }
+            }
+            Relation.OUTGOING -> Button(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.card_request_sent))
+            }
+            Relation.COOLDOWN -> Button(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.card_retry_in, hoursUntil(user.retryAt)))
+            }
+            Relation.INCOMING -> StatusText(stringResource(R.string.card_incoming))
+            Relation.CHAT -> StatusText(stringResource(R.string.card_already_chatting))
+            Relation.BLOCKED_BY_ME -> Unit
+        }
+    }
+}
+
+@Composable
+private fun StatusText(text: String) {
+    Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+}
+
+/** Сколько полных часов осталось, с округлением вверх: за минуту до срока — «1 ч». */
+private fun hoursUntil(moment: Instant?): Int {
+    val seconds = moment?.let { Duration.between(Instant.now(), it).seconds } ?: 0
+    return ((seconds + 3599) / 3600).coerceAtLeast(1).toInt()
+}

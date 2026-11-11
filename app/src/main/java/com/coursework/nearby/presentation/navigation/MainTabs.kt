@@ -17,7 +17,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.coursework.nearby.domain.model.Profile
+import com.coursework.nearby.presentation.map.MapScreen
+import com.coursework.nearby.presentation.map.MapViewModel
+import com.coursework.nearby.presentation.map.hasFineLocationPermission
 import com.coursework.nearby.presentation.placeholder.PlaceholderScreen
 import com.coursework.nearby.presentation.profile.ProfileEditScreen
 import com.coursework.nearby.presentation.profile.ProfileScreen
@@ -31,6 +38,15 @@ fun MainTabs(profile: Profile, onSignOut: () -> Unit) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
     val onTab = TopLevelDestination.entries.any { it.route == currentDestination?.route }
+
+    // Собирается на уровне вкладок, чтобы местоположение передавалось при любой открытой вкладке.
+    val mapViewModel: MapViewModel = hiltViewModel()
+    val mapState by mapViewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    LifecycleResumeEffect(Unit) {
+        mapViewModel.onPermissionChanged(context.hasFineLocationPermission())
+        onPauseOrDispose {}
+    }
 
     Scaffold(
         bottomBar = {
@@ -60,7 +76,10 @@ fun MainTabs(profile: Profile, onSignOut: () -> Unit) {
             startDestination = TopLevelDestination.MAP.route,
             modifier = Modifier.padding(innerPadding),
         ) {
-            listOf(TopLevelDestination.MAP, TopLevelDestination.REQUESTS, TopLevelDestination.CHATS).forEach { destination ->
+            composable(TopLevelDestination.MAP.route) {
+                MapScreen(state = mapState, viewModel = mapViewModel)
+            }
+            listOf(TopLevelDestination.REQUESTS, TopLevelDestination.CHATS).forEach { destination ->
                 composable(destination.route) {
                     PlaceholderScreen(titleRes = destination.labelRes, iconRes = destination.iconRes)
                 }
