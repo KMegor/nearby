@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Рядом</string>
+    <string name="tab_map">Карта</string>
+    <string name="tab_requests">Запросы</string>
+    <string name="tab_chats">Чаты</string>
+    <string name="tab_profile">Профиль</string>
+    <string name="placeholder_coming_soon">Раздел появится на следующих этапах</string>
+</resources>
