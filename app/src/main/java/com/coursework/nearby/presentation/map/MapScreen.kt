@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -39,6 +38,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.coursework.nearby.R
 import com.coursework.nearby.domain.model.SearchRadius
+import com.coursework.nearby.presentation.common.AppCard
 import com.coursework.nearby.presentation.common.messageRes
 
 fun Context.hasFineLocationPermission(): Boolean =
@@ -88,10 +88,10 @@ fun MapScreen(state: MapUiState, viewModel: MapViewModel, onOpenChat: (String) -
                 onRadiusChange = viewModel::onRadiusChange,
             )
             state.error?.let { error ->
-                ElevatedCard(onClick = viewModel::onErrorShown) {
+                AppCard(onClick = viewModel::onErrorShown) {
                     Text(
                         stringResource(error.messageRes()),
-                        modifier = Modifier.padding(12.dp),
+                        modifier = Modifier.padding(16.dp),
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
@@ -137,11 +137,11 @@ fun MapScreen(state: MapUiState, viewModel: MapViewModel, onOpenChat: (String) -
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ModeCard(state: MapUiState, onVisibilityChange: (Boolean) -> Unit, onRadiusChange: (SearchRadius) -> Unit) {
-    ElevatedCard(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    AppCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(horizontal = 18.dp, vertical = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.map_visibility), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.map_visibility), style = MaterialTheme.typography.titleLarge)
                     Text(
                         text = stringResource(
                             when {

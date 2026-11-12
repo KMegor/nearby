@@ -1,6 +1,7 @@
 package com.coursework.nearby.presentation.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -50,8 +52,13 @@ fun ErrorScreen(error: AppError, onRetry: () -> Unit, onSignOut: (() -> Unit)? =
 
 /** Фото профиля; без фото — круг с первой буквой имени. [model] — адрес или локальный Uri. */
 @Composable
-fun Avatar(model: Any?, name: String, size: Dp, modifier: Modifier = Modifier) {
-    val shape = modifier.size(size).clip(CircleShape)
+fun Avatar(model: Any?, name: String, size: Dp, modifier: Modifier = Modifier, ring: Boolean = false) {
+    val colors = MaterialTheme.colorScheme
+    val accent = if (colors.primary.red > 0.5f) colors.primary else colors.tertiary
+    val shape = modifier
+        .size(size)
+        .then(if (ring) Modifier.border(2.dp, accent, CircleShape).padding(5.dp) else Modifier)
+        .clip(CircleShape)
     if (model != null) {
         AsyncImage(
             model = model,
@@ -60,11 +67,14 @@ fun Avatar(model: Any?, name: String, size: Dp, modifier: Modifier = Modifier) {
             contentScale = ContentScale.Crop,
         )
     } else {
-        Box(shape.background(MaterialTheme.colorScheme.primaryContainer), contentAlignment = Alignment.Center) {
+        Box(
+            shape.background(Brush.linearGradient(listOf(colors.surfaceContainerHighest, colors.surfaceContainerLow))),
+            contentAlignment = Alignment.Center,
+        ) {
             Text(
                 text = name.trim().take(1).uppercase().ifEmpty { "?" },
                 style = if (size >= 72.dp) MaterialTheme.typography.headlineLarge else MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = accent,
             )
         }
     }

@@ -36,6 +36,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.coursework.nearby.R
 import com.coursework.nearby.domain.validation.CredentialsFieldError
 import com.coursework.nearby.domain.validation.CredentialsValidator
+import com.coursework.nearby.presentation.common.LogoMark
+import com.coursework.nearby.presentation.common.PrimaryButton
 import com.coursework.nearby.presentation.common.messageRes
 
 @Composable
@@ -47,14 +49,16 @@ fun AuthScreen(modifier: Modifier = Modifier, viewModel: AuthViewModel = hiltVie
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.primary)
+        LogoMark(size = 72.dp)
+        Spacer(Modifier.height(4.dp))
+        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.displaySmall)
         Text(
             stringResource(R.string.auth_tagline),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(20.dp))
 
         val fieldModifier = Modifier.widthIn(max = 420.dp).fillMaxWidth()
         OutlinedTextField(
@@ -90,13 +94,13 @@ fun AuthScreen(modifier: Modifier = Modifier, viewModel: AuthViewModel = hiltVie
             Text(stringResource(it.messageRes()), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
         }
 
-        Button(onClick = viewModel::onSubmit, enabled = !state.isLoading, modifier = fieldModifier.testTag("submit")) {
-            if (state.isLoading) {
-                CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-            } else {
-                Text(stringResource(if (state.isSignUp) R.string.auth_sign_up else R.string.auth_sign_in))
-            }
-        }
+        Spacer(Modifier.height(4.dp))
+        PrimaryButton(
+            text = stringResource(if (state.isSignUp) R.string.auth_sign_up else R.string.auth_sign_in),
+            onClick = viewModel::onSubmit,
+            loading = state.isLoading,
+            modifier = fieldModifier.testTag("submit"),
+        )
         TextButton(onClick = viewModel::onToggleMode, enabled = !state.isLoading, modifier = Modifier.testTag("toggle")) {
             Text(stringResource(if (state.isSignUp) R.string.auth_to_sign_in else R.string.auth_to_sign_up))
         }

@@ -6,7 +6,9 @@ import com.coursework.nearby.data.repository.ChatRepositoryImpl
 import com.coursework.nearby.data.repository.ConnectionRepositoryImpl
 import com.coursework.nearby.data.repository.PresenceRepositoryImpl
 import com.coursework.nearby.data.repository.ProfileRepositoryImpl
+import com.coursework.nearby.data.repository.SettingsRepositoryImpl
 import com.coursework.nearby.domain.location.LocationProvider
+import com.coursework.nearby.domain.repository.SettingsRepository
 import com.coursework.nearby.domain.repository.ChatRepository
 import com.coursework.nearby.domain.repository.ConnectionRepository
 import com.coursework.nearby.domain.repository.PresenceRepository
@@ -40,6 +42,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindChatRepository(impl: ChatRepositoryImpl): ChatRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
 
     @Binds
     @Singleton

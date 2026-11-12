@@ -12,11 +12,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,7 +34,11 @@ import com.coursework.nearby.domain.model.ComplaintReason
 import com.coursework.nearby.domain.model.ConnectionSummary
 import com.coursework.nearby.domain.model.Relation
 import com.coursework.nearby.domain.model.RequestResponse
+import com.coursework.nearby.presentation.common.AppCard
 import com.coursework.nearby.presentation.common.Avatar
+import com.coursework.nearby.presentation.common.PrimaryButton
+import com.coursework.nearby.presentation.common.ScreenTitle
+import com.coursework.nearby.presentation.common.SecondaryButton
 import com.coursework.nearby.presentation.common.LoadingScreen
 import com.coursework.nearby.presentation.common.ageLabel
 import com.coursework.nearby.presentation.common.hoursUntil
@@ -61,10 +62,11 @@ fun RequestsScreen(state: ConnectionsUiState, viewModel: ConnectionsViewModel) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        item(key = "title") { ScreenTitle(stringResource(R.string.tab_requests)) }
         state.error?.let { error ->
             item(key = "error") {
-                ElevatedCard(onClick = viewModel::onErrorShown, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(error.messageRes()), Modifier.padding(12.dp), color = MaterialTheme.colorScheme.error)
+                AppCard(onClick = viewModel::onErrorShown, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(error.messageRes()), Modifier.padding(16.dp), color = MaterialTheme.colorScheme.error)
                 }
             }
         }
@@ -113,13 +115,18 @@ fun RequestsScreen(state: ConnectionsUiState, viewModel: ConnectionsViewModel) {
 
 @Composable
 private fun SectionTitle(text: String) {
-    Text(text, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 4.dp))
+    Text(
+        text.uppercase(),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(top = 8.dp, start = 4.dp),
+    )
 }
 
 @Composable
 private fun PersonHeader(person: ConnectionSummary) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Avatar(model = person.avatarUrl, name = person.name, size = 48.dp)
+        Avatar(model = person.avatarUrl, name = person.name, size = 56.dp)
         Column(Modifier.weight(1f)) {
             Text("${person.name}, ${ageLabel(person.age)}", style = MaterialTheme.typography.titleMedium)
             if (person.bio.isNotEmpty()) {
@@ -143,7 +150,7 @@ private fun IncomingRequestCard(
     onReject: () -> Unit,
     onBlock: () -> Unit,
 ) {
-    ElevatedCard(Modifier.fillMaxWidth()) {
+    AppCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             PersonHeader(request)
             if (request.interests.isNotEmpty()) {
@@ -154,12 +161,8 @@ private fun IncomingRequestCard(
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = onAccept, enabled = !busy, modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.requests_accept))
-                }
-                OutlinedButton(onClick = onReject, enabled = !busy, modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.requests_reject))
-                }
+                PrimaryButton(stringResource(R.string.requests_accept), onClick = onAccept, enabled = !busy, modifier = Modifier.weight(1f))
+                SecondaryButton(stringResource(R.string.requests_reject), onClick = onReject, enabled = !busy, modifier = Modifier.weight(1f))
             }
             // Условие G4: блокировка доступна, начиная со второго отказа этому отправителю.
             if (request.canBlockOnReject) {
@@ -173,7 +176,7 @@ private fun IncomingRequestCard(
 
 @Composable
 private fun OutgoingRequestCard(request: ConnectionSummary) {
-    ElevatedCard(Modifier.fillMaxWidth()) {
+    AppCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             PersonHeader(request)
             Text(

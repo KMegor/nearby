@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -20,7 +19,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.coursework.nearby.R
+import com.coursework.nearby.presentation.common.AppCard
 import com.coursework.nearby.presentation.common.Avatar
+import com.coursework.nearby.presentation.common.ScreenTitle
 import com.coursework.nearby.presentation.common.messageRes
 
 /** «Заблокированные»: единственное место, где заблокированного можно найти и разблокировать. */
@@ -31,7 +32,7 @@ fun BlockedScreen(state: ConnectionsUiState, viewModel: ConnectionsViewModel, on
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item(key = "title") { Text(stringResource(R.string.blocked_title), style = MaterialTheme.typography.headlineSmall) }
+        item(key = "title") { ScreenTitle(stringResource(R.string.blocked_title)) }
         state.error?.let { error ->
             item(key = "error") {
                 Text(stringResource(error.messageRes()), color = MaterialTheme.colorScheme.error)
@@ -48,7 +49,7 @@ fun BlockedScreen(state: ConnectionsUiState, viewModel: ConnectionsViewModel, on
             }
         }
         items(state.lists.blocked, key = { it.connectionId }) { person ->
-            ElevatedCard(Modifier.fillMaxWidth()) {
+            AppCard(Modifier.fillMaxWidth()) {
                 Row(
                     Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,

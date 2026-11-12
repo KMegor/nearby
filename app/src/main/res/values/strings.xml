@@ -77,6 +77,10 @@
     <string name="blocked_empty">Вы никого не заблокировали</string>
     <string name="blocked_unblock">Разблокировать</string>
     <string name="profile_blocked">Заблокированные</string>
+    <string name="profile_theme">Оформление</string>
+    <string name="theme_dark">Тёмное</string>
+    <string name="theme_light">Светлое</string>
+    <string name="theme_system">Как в системе</string>
 
     <string name="chats_empty">Чатов пока нет. Они появятся, когда запрос на общение будет принят.</string>
     <string name="chats_no_messages">Сообщений пока нет</string>

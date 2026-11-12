@@ -1,7 +1,6 @@
 package com.coursework.nearby.presentation.map
 
 import android.graphics.RectF
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +20,7 @@ import com.coursework.nearby.domain.model.GeoPoint
 import com.coursework.nearby.domain.model.NearbyUser
 import com.coursework.nearby.domain.model.Relation
 import com.coursework.nearby.domain.model.SearchRadius
+import com.coursework.nearby.presentation.theme.LocalDarkTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -65,16 +65,19 @@ private const val LAYER_USERS = "nearby-users-layer"
 private const val PROP_ID = "id"
 private const val PROP_COLOR = "color"
 
-private const val COLOR_PRIMARY = "#2869DC"
+/** Цвета слоёв карты для тёмного и светлого оформления. */
+private class MapPalette(val accent: String, val markerStroke: String, val me: String, val background: String)
+
+private val DARK_PALETTE = MapPalette(accent = "#E8B15A", markerStroke = "#0B1220", me = "#FFFFFF", background = "#0F1828")
+private val LIGHT_PALETTE = MapPalette(accent = "#14213D", markerStroke = "#FFFFFF", me = "#FFFFFF", background = "#EFECE5")
 private val DEFAULT_CENTER = LatLng(55.7522, 37.6156)
 
 /** Цвет точки по отношению к человеку (таблица отображения из согласованных требований). */
-fun Relation.markerColor(): String = when (this) {
-    Relation.NONE -> COLOR_PRIMARY
-    Relation.OUTGOING, Relation.INCOMING -> "#F08C00"
-    Relation.CHAT -> "#1E8E6E"
-    Relation.COOLDOWN -> "#8A8F98"
-    Relation.BLOCKED_BY_ME -> "#8A8F98"
+fun Relation.markerColor(dark: Boolean): String = when (this) {
+    Relation.NONE -> if (dark) "#E8B15A" else "#14213D"
+    Relation.OUTGOING, Relation.INCOMING -> if (dark) "#FF8F6B" else "#D9541E"
+    Relation.CHAT -> if (dark) "#6FD3B4" else "#1E8E6E"
+    Relation.COOLDOWN, Relation.BLOCKED_BY_ME -> if (dark) "#62718C" else "#8A8F98"
 }
 
 /**
@@ -92,7 +95,8 @@ fun NearbyMap(
 ) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val dark = isSystemInDarkTheme()
+    val dark = LocalDarkTheme.current
+    val palette = if (dark) DARK_PALETTE else LIGHT_PALETTE
     val currentOnUserClick by rememberUpdatedState(onUserClick)
     var layers by remember { mutableStateOf<MapLayers?>(null) }
 
@@ -125,12 +129,12 @@ fun NearbyMap(
         layers = null
         // Подложку загружаем сами с коротким ожиданием: без сети карта сразу открывается на пустом
         // фоне, и круг с людьми видны без задержки.
-        val styleJson = fetchStyle(if (dark) STYLE_DARK else STYLE_LIGHT) ?: fallbackStyle(dark)
+        val styleJson = fetchStyle(if (dark) STYLE_DARK else STYLE_LIGHT) ?: fallbackStyle(palette)
         mapView.getMapAsync { map ->
             map.uiSettings.isRotateGesturesEnabled = false
             map.uiSettings.isTiltGesturesEnabled = false
             if (map.style == null) map.cameraPosition = CameraPosition.Builder().target(DEFAULT_CENTER).zoom(10.0).build()
-            map.setStyle(Style.Builder().fromJson(styleJson)) { style -> layers = MapLayers(map, style) }
+            map.setStyle(Style.Builder().fromJson(styleJson)) { style -> layers = MapLayers(map, style, palette, dark) }
             map.addOnMapClickListener { latLng ->
                 val point = map.projection.toScreenLocation(latLng)
                 val touch = RectF(point.x - TOUCH_PX, point.y - TOUCH_PX, point.x + TOUCH_PX, point.y + TOUCH_PX)
@@ -171,12 +175,12 @@ private suspend fun fetchStyle(url: String): String? {
     return withTimeoutOrNull(STYLE_TIMEOUT_MS) { request.await() }
 }
 
-private fun fallbackStyle(dark: Boolean): String {
-    val background = if (dark) "#1D2026" else "#EEF1F6"
+private fun fallbackStyle(palette: MapPalette): String {
+    val background = palette.background
     return """{"version":8,"sources":{},"layers":[{"id":"background","type":"background","paint":{"background-color":"$background"}}]}"""
 }
 
-private class MapLayers(private val map: MapLibreMap, style: Style) {
+private class MapLayers(private val map: MapLibreMap, style: Style, palette: MapPalette, private val dark: Boolean) {
     private val area = GeoJsonSource(SOURCE_AREA)
     private val me = GeoJsonSource(SOURCE_ME)
     private val users = GeoJsonSource(SOURCE_USERS)
@@ -185,18 +189,18 @@ private class MapLayers(private val map: MapLibreMap, style: Style) {
         style.addSource(area)
         style.addSource(me)
         style.addSource(users)
-        style.addLayer(FillLayer("nearby-area-fill", SOURCE_AREA).withProperties(fillColor(COLOR_PRIMARY), fillOpacity(0.10f)))
-        style.addLayer(LineLayer("nearby-area-line", SOURCE_AREA).withProperties(lineColor(COLOR_PRIMARY), lineWidth(2f)))
+        style.addLayer(FillLayer("nearby-area-fill", SOURCE_AREA).withProperties(fillColor(palette.accent), fillOpacity(0.10f)))
+        style.addLayer(LineLayer("nearby-area-line", SOURCE_AREA).withProperties(lineColor(palette.accent), lineWidth(1.5f)))
         style.addLayer(
             CircleLayer("nearby-me-layer", SOURCE_ME).withProperties(
-                circleRadius(6f), circleColor("#FFFFFF"), circleStrokeColor(COLOR_PRIMARY), circleStrokeWidth(4f),
+                circleRadius(6f), circleColor(palette.me), circleStrokeColor(palette.accent), circleStrokeWidth(4f),
             ),
         )
         style.addLayer(
             CircleLayer(LAYER_USERS, SOURCE_USERS).withProperties(
                 circleRadius(11f),
                 circleColor(Expression.toColor(Expression.get(PROP_COLOR))),
-                circleStrokeColor("#FFFFFF"),
+                circleStrokeColor(palette.markerStroke),
                 circleStrokeWidth(3f),
             ),
         )
@@ -221,7 +225,7 @@ private class MapLayers(private val map: MapLibreMap, style: Style) {
                 list.map { user ->
                     Feature.fromGeometry(Point.fromLngLat(user.point.longitude, user.point.latitude)).apply {
                         addStringProperty(PROP_ID, user.id)
-                        addStringProperty(PROP_COLOR, user.relation.markerColor())
+                        addStringProperty(PROP_COLOR, user.relation.markerColor(dark))
                     }
                 },
             ),

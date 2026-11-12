@@ -25,6 +25,7 @@ import com.coursework.nearby.R
 import com.coursework.nearby.domain.model.ConnectionSummary
 import com.coursework.nearby.presentation.common.Avatar
 import com.coursework.nearby.presentation.common.LoadingScreen
+import com.coursework.nearby.presentation.common.ScreenTitle
 import com.coursework.nearby.presentation.common.messageRes
 import com.coursework.nearby.presentation.common.timeLabel
 import com.coursework.nearby.presentation.connections.ConnectionsUiState
@@ -41,6 +42,9 @@ fun ChatsScreen(state: ConnectionsUiState, viewModel: ConnectionsViewModel, onOp
         return
     }
     LazyColumn(Modifier.fillMaxSize()) {
+        item(key = "title") {
+            ScreenTitle(stringResource(R.string.tab_chats), Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp))
+        }
         state.error?.let { error ->
             item(key = "error") {
                 Text(stringResource(error.messageRes()), Modifier.padding(16.dp), color = MaterialTheme.colorScheme.error)
@@ -59,7 +63,7 @@ fun ChatsScreen(state: ConnectionsUiState, viewModel: ConnectionsViewModel, onOp
         }
         items(state.lists.chats, key = { it.connectionId }) { chat ->
             ChatRow(chat, onClick = { onOpenChat(chat.connectionId) })
-            HorizontalDivider()
+            HorizontalDivider(Modifier.padding(start = 84.dp), color = MaterialTheme.colorScheme.outlineVariant)
         }
     }
 }
@@ -71,7 +75,7 @@ private fun ChatRow(chat: ConnectionSummary, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Avatar(model = chat.avatarUrl, name = chat.name, size = 52.dp)
+        Avatar(model = chat.avatarUrl, name = chat.name, size = 56.dp)
         Column(Modifier.weight(1f)) {
             Text(chat.name, style = MaterialTheme.typography.titleMedium)
             Text(

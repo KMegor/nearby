@@ -22,6 +22,7 @@ import com.coursework.nearby.R
 import com.coursework.nearby.domain.model.NearbyUser
 import com.coursework.nearby.domain.model.Relation
 import com.coursework.nearby.presentation.common.Avatar
+import com.coursework.nearby.presentation.common.PrimaryButton
 import com.coursework.nearby.presentation.common.ageLabel
 import com.coursework.nearby.presentation.common.hoursUntil
 
@@ -40,9 +41,9 @@ fun UserCard(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Avatar(model = user.avatarUrl, name = user.name, size = 72.dp)
+            Avatar(model = user.avatarUrl, name = user.name, size = 84.dp, ring = true)
             Column {
-                Text(user.name, style = MaterialTheme.typography.titleLarge)
+                Text(user.name, style = MaterialTheme.typography.headlineSmall)
                 Text(ageLabel(user.age), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
@@ -54,24 +55,30 @@ fun UserCard(
         }
 
         when (user.relation) {
-            Relation.NONE -> Button(onClick = onSendRequest, enabled = !isSending, modifier = Modifier.fillMaxWidth()) {
-                if (isSending) {
-                    CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                } else {
-                    Text(stringResource(R.string.card_start_chat))
-                }
-            }
-            Relation.OUTGOING -> Button(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.card_request_sent))
-            }
-            Relation.COOLDOWN -> Button(onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.card_retry_in, hoursUntil(user.retryAt)))
-            }
+            Relation.NONE -> PrimaryButton(
+                text = stringResource(R.string.card_start_chat),
+                onClick = onSendRequest,
+                loading = isSending,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Relation.OUTGOING -> PrimaryButton(
+                text = stringResource(R.string.card_request_sent),
+                onClick = {},
+                enabled = false,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Relation.COOLDOWN -> PrimaryButton(
+                text = stringResource(R.string.card_retry_in, hoursUntil(user.retryAt)),
+                onClick = {},
+                enabled = false,
+                modifier = Modifier.fillMaxWidth(),
+            )
             Relation.INCOMING -> StatusText(stringResource(R.string.card_incoming))
-            Relation.CHAT -> Button(
+            Relation.CHAT -> PrimaryButton(
+                text = stringResource(R.string.card_open_chat),
                 onClick = { user.connectionId?.let(onOpenChat) },
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text(stringResource(R.string.card_open_chat)) }
+            )
             Relation.BLOCKED_BY_ME -> Unit
         }
     }

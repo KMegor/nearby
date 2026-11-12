@@ -41,6 +41,7 @@ import com.coursework.nearby.R
 import com.coursework.nearby.domain.validation.ProfileFieldError
 import com.coursework.nearby.domain.validation.ProfileValidator
 import com.coursework.nearby.presentation.common.Avatar
+import com.coursework.nearby.presentation.common.PrimaryButton
 import com.coursework.nearby.presentation.common.messageRes
 
 /**
@@ -71,7 +72,7 @@ fun ProfileEditScreen(
     ) {
         Text(
             stringResource(if (isSetup) R.string.profile_setup_title else R.string.profile_edit_title),
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.headlineLarge,
         )
         if (isSetup) {
             Text(
@@ -82,7 +83,7 @@ fun ProfileEditScreen(
         }
 
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Avatar(model = state.pendingAvatarUri ?: state.avatarUrl, name = state.name, size = 88.dp)
+            Avatar(model = state.pendingAvatarUri ?: state.avatarUrl, name = state.name, size = 96.dp, ring = true)
             OutlinedButton(
                 onClick = {
                     photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
@@ -166,13 +167,12 @@ fun ProfileEditScreen(
 
         state.error?.let { Text(stringResource(it.messageRes()), color = MaterialTheme.colorScheme.error) }
 
-        Button(onClick = viewModel::onSave, enabled = !state.isSaving, modifier = Modifier.fillMaxWidth().testTag("save")) {
-            if (state.isSaving) {
-                CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-            } else {
-                Text(stringResource(R.string.action_save))
-            }
-        }
+        PrimaryButton(
+            text = stringResource(R.string.action_save),
+            onClick = viewModel::onSave,
+            loading = state.isSaving,
+            modifier = Modifier.fillMaxWidth().testTag("save"),
+        )
         if (!isSetup) {
             TextButton(onClick = onDone, enabled = !state.isSaving, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.action_back))
