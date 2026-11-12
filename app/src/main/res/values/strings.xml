@@ -5,7 +5,6 @@
     <string name="tab_requests">Запросы</string>
     <string name="tab_chats">Чаты</string>
     <string name="tab_profile">Профиль</string>
-    <string name="placeholder_coming_soon">Раздел появится на следующих этапах</string>
 
     <string name="action_retry">Повторить</string>
     <string name="action_sign_out">Выйти</string>
@@ -58,7 +57,6 @@
     <string name="card_request_sent">Запрос отправлен</string>
     <string name="card_retry_in">Повторный запрос через %1$d ч</string>
     <string name="card_incoming">Хочет пообщаться с вами. Ответить можно во вкладке «Запросы».</string>
-    <string name="card_already_chatting">Вы уже общаетесь. Чат — во вкладке «Чаты».</string>
 
     <string name="requests_empty">Запросов пока нет. Найдите собеседника на карте.</string>
     <string name="requests_incoming">Входящие</string>
@@ -69,7 +67,7 @@
     <string name="requests_status_waiting">Ожидает ответа</string>
     <string name="requests_status_rejected">Запрос отклонён. Повторить можно через %1$d ч</string>
     <string name="block_reject_title">Отклонить и заблокировать?</string>
-    <string name="block_text">%1$s больше не сможет отправлять вам запросы. Разблокировать можно в профиле, в разделе «Заблокированные».</string>
+    <string name="block_text">%1$s больше не сможет писать вам и отправлять запросы. Разблокировать можно в профиле, в разделе «Заблокированные».</string>
     <string name="block_complain">Пожаловаться</string>
     <string name="block_confirm">Заблокировать</string>
     <string name="complaint_spam">Спам</string>
@@ -79,6 +77,19 @@
     <string name="blocked_empty">Вы никого не заблокировали</string>
     <string name="blocked_unblock">Разблокировать</string>
     <string name="profile_blocked">Заблокированные</string>
+
+    <string name="chats_empty">Чатов пока нет. Они появятся, когда запрос на общение будет принят.</string>
+    <string name="chats_no_messages">Сообщений пока нет</string>
+    <string name="chat_empty">Напишите первое сообщение</string>
+    <string name="chat_placeholder">Сообщение</string>
+    <string name="chat_send">Отправить</string>
+    <string name="chat_menu">Меню</string>
+    <string name="chat_block">Заблокировать</string>
+    <string name="chat_load_older">Показать более ранние</string>
+    <string name="chat_cannot_send">Отправка сообщений недоступна</string>
+    <string name="chat_error_too_long">Не длиннее %1$d символов</string>
+    <string name="block_chat_title">Заблокировать собеседника?</string>
+    <string name="card_open_chat">Открыть чат</string>
 
     <string name="ban_title">Аккаунт отстранён</string>
     <string name="ban_until">На вас поступили жалобы. Доступ вернётся %1$s.</string>
@@ -98,5 +109,6 @@
     <string name="error_already_pending">Запрос уже отправлен</string>
     <string name="error_not_pending">Запрос уже неактуален</string>
     <string name="error_block_not_available">Блокировка доступна со второго отказа</string>
+    <string name="error_cannot_send">Отправка сообщений недоступна</string>
     <string name="error_age_restricted">Приложение доступно с 18 лет</string>
 </resources>

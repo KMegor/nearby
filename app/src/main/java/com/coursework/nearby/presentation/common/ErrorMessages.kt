@@ -21,6 +21,7 @@ fun AppError.messageRes(): Int = when (this) {
         ServerError.BANNED -> R.string.error_banned
         ServerError.AGE_RESTRICTED -> R.string.error_age_restricted
         ServerError.NOT_PENDING, ServerError.NOT_FOUND, ServerError.NOT_BLOCKED_BY_YOU -> R.string.error_not_pending
+        ServerError.CANNOT_SEND, ServerError.NOT_ACTIVE -> R.string.error_cannot_send
         ServerError.BLOCK_NOT_AVAILABLE -> R.string.error_block_not_available
         ServerError.OUT_OF_RANGE, ServerError.NOT_VISIBLE -> R.string.error_out_of_range
         ServerError.USER_UNAVAILABLE -> R.string.error_user_unavailable

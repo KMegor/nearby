@@ -1,5 +1,6 @@
 package com.coursework.nearby.domain.repository
 
+import com.coursework.nearby.domain.model.ComplaintReason
 import com.coursework.nearby.domain.model.ConnectionSummary
 import com.coursework.nearby.domain.model.Relation
 import com.coursework.nearby.domain.model.RequestResponse
@@ -20,6 +21,9 @@ interface ConnectionRepository {
 
     /** События E5, E6, E7 из состояния «запрос отправлен». */
     suspend fun respond(connectionId: String, response: RequestResponse)
+
+    /** Событие E7 из чата, с необязательной жалобой E10. */
+    suspend fun blockChat(connectionId: String, complaint: ComplaintReason?)
 
     /** Событие E8. */
     suspend fun unblock(connectionId: String)

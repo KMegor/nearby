@@ -1,6 +1,7 @@
 package com.coursework.nearby.domain.usecase
 
 import com.coursework.nearby.domain.repository.AuthRepository
+import com.coursework.nearby.domain.repository.ChatRepository
 import com.coursework.nearby.domain.repository.ConnectionRepository
 import com.coursework.nearby.domain.validation.CredentialsFieldError
 import com.coursework.nearby.domain.validation.CredentialsValidator
@@ -32,10 +33,12 @@ class SignUpUseCase @Inject constructor(private val auth: AuthRepository) {
 class SignOutUseCase @Inject constructor(
     private val auth: AuthRepository,
     private val connections: ConnectionRepository,
+    private val chat: ChatRepository,
 ) {
     suspend operator fun invoke() {
         // Следующий вошедший не должен увидеть чужие запросы и чаты.
         connections.clear()
+        chat.clear()
         auth.signOut()
     }
 }

@@ -24,18 +24,23 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.coursework.nearby.domain.model.Profile
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.coursework.nearby.presentation.chat.ChatScreen
+import com.coursework.nearby.presentation.chat.ChatViewModel
+import com.coursework.nearby.presentation.chat.ChatsScreen
 import com.coursework.nearby.presentation.connections.BlockedScreen
 import com.coursework.nearby.presentation.connections.ConnectionsViewModel
 import com.coursework.nearby.presentation.connections.RequestsScreen
 import com.coursework.nearby.presentation.map.MapScreen
 import com.coursework.nearby.presentation.map.MapViewModel
 import com.coursework.nearby.presentation.map.hasFineLocationPermission
-import com.coursework.nearby.presentation.placeholder.PlaceholderScreen
 import com.coursework.nearby.presentation.profile.ProfileEditScreen
 import com.coursework.nearby.presentation.profile.ProfileScreen
 
 private const val ROUTE_PROFILE_EDIT = "profile/edit"
 private const val ROUTE_BLOCKED = "profile/blocked"
+private const val ROUTE_CHAT = "chat"
 
 /** Основное приложение: четыре вкладки и экраны, открываемые поверх них. */
 @Composable
@@ -73,13 +78,13 @@ fun MainTabs(profile: Profile, onSignOut: () -> Unit) {
                                 }
                             },
                             icon = {
-                                val incoming = connectionsState.lists.incoming.size
+                                val count = when (destination) {
+                                    TopLevelDestination.REQUESTS -> connectionsState.lists.incoming.size
+                                    TopLevelDestination.CHATS -> connectionsState.lists.chats.sumOf { it.unread }
+                                    else -> 0
+                                }
                                 BadgedBox(
-                                    badge = {
-                                        if (destination == TopLevelDestination.REQUESTS && incoming > 0) {
-                                            Badge { Text(incoming.toString()) }
-                                        }
-                                    },
+                                    badge = { if (count > 0) Badge { Text(count.toString()) } },
                                 ) {
                                     Icon(painterResource(destination.iconRes), contentDescription = null)
                                 }
@@ -97,13 +102,27 @@ fun MainTabs(profile: Profile, onSignOut: () -> Unit) {
             modifier = Modifier.padding(innerPadding),
         ) {
             composable(TopLevelDestination.MAP.route) {
-                MapScreen(state = mapState, viewModel = mapViewModel)
+                MapScreen(
+                    state = mapState,
+                    viewModel = mapViewModel,
+                    onOpenChat = { navController.navigate("$ROUTE_CHAT/$it") },
+                )
             }
             composable(TopLevelDestination.REQUESTS.route) {
                 RequestsScreen(state = connectionsState, viewModel = connectionsViewModel)
             }
             composable(TopLevelDestination.CHATS.route) {
-                PlaceholderScreen(titleRes = TopLevelDestination.CHATS.labelRes, iconRes = TopLevelDestination.CHATS.iconRes)
+                ChatsScreen(
+                    state = connectionsState,
+                    viewModel = connectionsViewModel,
+                    onOpenChat = { navController.navigate("$ROUTE_CHAT/$it") },
+                )
+            }
+            composable(
+                route = "$ROUTE_CHAT/{${ChatViewModel.ARG_CONNECTION_ID}}",
+                arguments = listOf(navArgument(ChatViewModel.ARG_CONNECTION_ID) { type = NavType.StringType }),
+            ) {
+                ChatScreen(onBack = { navController.popBackStack() })
             }
             composable(ROUTE_BLOCKED) {
                 BlockedScreen(

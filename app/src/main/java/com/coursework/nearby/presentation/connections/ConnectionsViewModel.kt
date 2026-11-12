@@ -73,6 +73,17 @@ class ConnectionsViewModel @Inject constructor(
     /** Событие E8. */
     fun onUnblock(connectionId: String) = act(connectionId) { unblock(connectionId) }
 
+    /** Перечитать список сейчас, не дожидаясь очередного опроса. */
+    fun onRefresh() {
+        viewModelScope.launch {
+            try {
+                refreshConnections()
+            } catch (e: AppException) {
+                local.update { it.copy(error = e.error) }
+            }
+        }
+    }
+
     fun onErrorShown() = local.update { it.copy(error = null) }
 
     private fun act(connectionId: String, action: suspend () -> Unit) {

@@ -46,7 +46,7 @@ fun Context.hasFineLocationPermission(): Boolean =
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(state: MapUiState, viewModel: MapViewModel) {
+fun MapScreen(state: MapUiState, viewModel: MapViewModel, onOpenChat: (String) -> Unit) {
     val context = LocalContext.current
     var showRationale by rememberSaveable { mutableStateOf(false) }
 
@@ -120,7 +120,15 @@ fun MapScreen(state: MapUiState, viewModel: MapViewModel) {
 
     state.selectedUser?.let { user ->
         ModalBottomSheet(onDismissRequest = { viewModel.onUserSelected(null) }) {
-            UserCard(user = user, isSending = state.isSendingRequest, onSendRequest = { viewModel.onSendRequest(user.id) })
+            UserCard(
+                user = user,
+                isSending = state.isSendingRequest,
+                onSendRequest = { viewModel.onSendRequest(user.id) },
+                onOpenChat = { connectionId ->
+                    viewModel.onUserSelected(null)
+                    onOpenChat(connectionId)
+                },
+            )
         }
     }
 }

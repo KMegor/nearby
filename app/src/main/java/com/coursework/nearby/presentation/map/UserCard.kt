@@ -28,7 +28,13 @@ import com.coursework.nearby.presentation.common.hoursUntil
 /** Карточка человека с карты: профиль и действие, доступное при текущем отношении. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun UserCard(user: NearbyUser, isSending: Boolean, onSendRequest: () -> Unit, modifier: Modifier = Modifier) {
+fun UserCard(
+    user: NearbyUser,
+    isSending: Boolean,
+    onSendRequest: () -> Unit,
+    onOpenChat: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -62,7 +68,10 @@ fun UserCard(user: NearbyUser, isSending: Boolean, onSendRequest: () -> Unit, mo
                 Text(stringResource(R.string.card_retry_in, hoursUntil(user.retryAt)))
             }
             Relation.INCOMING -> StatusText(stringResource(R.string.card_incoming))
-            Relation.CHAT -> StatusText(stringResource(R.string.card_already_chatting))
+            Relation.CHAT -> Button(
+                onClick = { user.connectionId?.let(onOpenChat) },
+                modifier = Modifier.fillMaxWidth(),
+            ) { Text(stringResource(R.string.card_open_chat)) }
             Relation.BLOCKED_BY_ME -> Unit
         }
     }

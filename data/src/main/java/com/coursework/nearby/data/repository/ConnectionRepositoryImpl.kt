@@ -2,6 +2,7 @@ package com.coursework.nearby.data.repository
 
 import com.coursework.nearby.data.remote.ConnectionSummaryDto
 import com.coursework.nearby.data.remote.remoteCall
+import com.coursework.nearby.domain.model.ComplaintReason
 import com.coursework.nearby.domain.model.ConnectionSummary
 import com.coursework.nearby.domain.model.Relation
 import com.coursework.nearby.domain.model.RequestResponse
@@ -61,6 +62,20 @@ class ConnectionRepositoryImpl @Inject constructor(
                             response.complaint?.let { put("p_reason", it.code) }
                         }
                     }
+                },
+            )
+        }
+        refresh()
+    }
+
+    override suspend fun blockChat(connectionId: String, complaint: ComplaintReason?) {
+        remoteCall {
+            client.postgrest.rpc(
+                "block_user",
+                buildJsonObject {
+                    put("p_connection", connectionId)
+                    put("p_complain", complaint != null)
+                    complaint?.let { put("p_reason", it.code) }
                 },
             )
         }

@@ -2,10 +2,12 @@ package com.coursework.nearby.data.di
 
 import com.coursework.nearby.data.repository.AuthRepositoryImpl
 import com.coursework.nearby.data.location.FusedLocationProvider
+import com.coursework.nearby.data.repository.ChatRepositoryImpl
 import com.coursework.nearby.data.repository.ConnectionRepositoryImpl
 import com.coursework.nearby.data.repository.PresenceRepositoryImpl
 import com.coursework.nearby.data.repository.ProfileRepositoryImpl
 import com.coursework.nearby.domain.location.LocationProvider
+import com.coursework.nearby.domain.repository.ChatRepository
 import com.coursework.nearby.domain.repository.ConnectionRepository
 import com.coursework.nearby.domain.repository.PresenceRepository
 import com.coursework.nearby.domain.repository.AuthRepository
@@ -34,6 +36,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindConnectionRepository(impl: ConnectionRepositoryImpl): ConnectionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindChatRepository(impl: ChatRepositoryImpl): ChatRepository
 
     @Binds
     @Singleton
