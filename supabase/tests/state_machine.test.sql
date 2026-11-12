@@ -12,7 +12,8 @@ create function tests.u(n int) returns uuid language sql immutable as $$
   select ('00000000-0000-0000-0000-' || lpad(n::text, 12, '0'))::uuid;
 $$;
 
--- Пользователь с профилем; lat/lng — смещение от базовой точки в градусах.
+-- Пользователь с профилем; lat/lng — смещение от базовой точки в градусах. Базовая точка — в океане,
+-- чтобы результат не зависел от пользователей, уже существующих в базе.
 create function tests.mk(n int, dlat float8 default 0, dlng float8 default 0,
                          p_visible boolean default true, p_radius int default 1) returns void
 language plpgsql as $$
@@ -21,7 +22,7 @@ begin
   values (tests.u(n), '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u' || n || '@test.local');
   insert into public.profiles (id, name, birth_year, visible, radius_km)
   values (tests.u(n), 'User ' || n, 1995, p_visible, p_radius);
-  insert into public.locations (user_id, geog) values (tests.u(n), public._snap(55.75 + dlat, 37.61 + dlng));
+  insert into public.locations (user_id, geog) values (tests.u(n), public._snap(10.75 + dlat, 137.61 + dlng));
 end $$;
 
 -- Выполнить выражение от имени пользователя n; вернуть результат текстом либо 'ERR:<код>'.
@@ -248,12 +249,12 @@ select is(tests.call(2, format('send_message(%s, ''hi'')', tests.cid(1, 2))), 'E
 select is(tests.listed(1, 2), 'chat/false', 'T17: чат остаётся, отправка недоступна');
 update public.profiles set banned_until = null where id = tests.u(2);
 
-update public.locations set geog = public._snap(56.75, 37.61) where user_id = tests.u(2);
+update public.locations set geog = public._snap(11.75, 137.61) where user_id = tests.u(2);
 select is(tests.call(1, 'set_visibility(false)'), 'false', 'T19: E2 в S3');
 select alike(tests.call(2, format('send_message(%s, ''далеко'')', tests.cid(1, 2))), '%далеко%', 'T19: чат работает без видимости и вне радиуса');
 select is(tests.st(1, 2), 'active', 'T19: состояние S3 не изменилось');
 select is(tests.call(1, 'set_visibility(true)'), 'true', 'T19: E1 в S3');
-update public.locations set geog = public._snap(55.752, 37.61) where user_id = tests.u(2);
+update public.locations set geog = public._snap(10.752, 137.61) where user_id = tests.u(2);
 select is(tests.call(2, 'set_visibility(true)'), 'true', 'собеседник снова видим');
 select is(tests.seen(1, 2), 'chat', 'S3: на карте собеседник отмечен как чат');
 
