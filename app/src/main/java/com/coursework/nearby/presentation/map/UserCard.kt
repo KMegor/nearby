@@ -23,8 +23,7 @@ import com.coursework.nearby.domain.model.NearbyUser
 import com.coursework.nearby.domain.model.Relation
 import com.coursework.nearby.presentation.common.Avatar
 import com.coursework.nearby.presentation.common.ageLabel
-import java.time.Duration
-import java.time.Instant
+import com.coursework.nearby.presentation.common.hoursUntil
 
 /** Карточка человека с карты: профиль и действие, доступное при текущем отношении. */
 @OptIn(ExperimentalLayoutApi::class)
@@ -72,10 +71,4 @@ fun UserCard(user: NearbyUser, isSending: Boolean, onSendRequest: () -> Unit, mo
 @Composable
 private fun StatusText(text: String) {
     Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-}
-
-/** Сколько полных часов осталось, с округлением вверх: за минуту до срока — «1 ч». */
-private fun hoursUntil(moment: Instant?): Int {
-    val seconds = moment?.let { Duration.between(Instant.now(), it).seconds } ?: 0
-    return ((seconds + 3599) / 3600).coerceAtLeast(1).toInt()
 }

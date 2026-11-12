@@ -1,6 +1,8 @@
 package com.coursework.nearby.presentation.navigation
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -22,6 +24,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.coursework.nearby.domain.model.Profile
+import com.coursework.nearby.presentation.connections.BlockedScreen
+import com.coursework.nearby.presentation.connections.ConnectionsViewModel
+import com.coursework.nearby.presentation.connections.RequestsScreen
 import com.coursework.nearby.presentation.map.MapScreen
 import com.coursework.nearby.presentation.map.MapViewModel
 import com.coursework.nearby.presentation.map.hasFineLocationPermission
@@ -30,6 +35,7 @@ import com.coursework.nearby.presentation.profile.ProfileEditScreen
 import com.coursework.nearby.presentation.profile.ProfileScreen
 
 private const val ROUTE_PROFILE_EDIT = "profile/edit"
+private const val ROUTE_BLOCKED = "profile/blocked"
 
 /** Основное приложение: четыре вкладки и экраны, открываемые поверх них. */
 @Composable
@@ -42,6 +48,9 @@ fun MainTabs(profile: Profile, onSignOut: () -> Unit) {
     // Собирается на уровне вкладок, чтобы местоположение передавалось при любой открытой вкладке.
     val mapViewModel: MapViewModel = hiltViewModel()
     val mapState by mapViewModel.state.collectAsStateWithLifecycle()
+    // То же для запросов: список перечитывается, пока приложение открыто.
+    val connectionsViewModel: ConnectionsViewModel = hiltViewModel()
+    val connectionsState by connectionsViewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LifecycleResumeEffect(Unit) {
         mapViewModel.onPermissionChanged(context.hasFineLocationPermission())
@@ -63,7 +72,18 @@ fun MainTabs(profile: Profile, onSignOut: () -> Unit) {
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(painterResource(destination.iconRes), contentDescription = null) },
+                            icon = {
+                                val incoming = connectionsState.lists.incoming.size
+                                BadgedBox(
+                                    badge = {
+                                        if (destination == TopLevelDestination.REQUESTS && incoming > 0) {
+                                            Badge { Text(incoming.toString()) }
+                                        }
+                                    },
+                                ) {
+                                    Icon(painterResource(destination.iconRes), contentDescription = null)
+                                }
+                            },
                             label = { Text(stringResource(destination.labelRes)) },
                         )
                     }
@@ -79,15 +99,24 @@ fun MainTabs(profile: Profile, onSignOut: () -> Unit) {
             composable(TopLevelDestination.MAP.route) {
                 MapScreen(state = mapState, viewModel = mapViewModel)
             }
-            listOf(TopLevelDestination.REQUESTS, TopLevelDestination.CHATS).forEach { destination ->
-                composable(destination.route) {
-                    PlaceholderScreen(titleRes = destination.labelRes, iconRes = destination.iconRes)
-                }
+            composable(TopLevelDestination.REQUESTS.route) {
+                RequestsScreen(state = connectionsState, viewModel = connectionsViewModel)
+            }
+            composable(TopLevelDestination.CHATS.route) {
+                PlaceholderScreen(titleRes = TopLevelDestination.CHATS.labelRes, iconRes = TopLevelDestination.CHATS.iconRes)
+            }
+            composable(ROUTE_BLOCKED) {
+                BlockedScreen(
+                    state = connectionsState,
+                    viewModel = connectionsViewModel,
+                    onBack = { navController.popBackStack() },
+                )
             }
             composable(TopLevelDestination.PROFILE.route) {
                 ProfileScreen(
                     profile = profile,
                     onEdit = { navController.navigate(ROUTE_PROFILE_EDIT) },
+                    onBlocked = { navController.navigate(ROUTE_BLOCKED) },
                     onSignOut = onSignOut,
                 )
             }

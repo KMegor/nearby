@@ -11,6 +11,7 @@
     <string name="action_sign_out">Выйти</string>
     <string name="action_save">Сохранить</string>
     <string name="action_back">Назад</string>
+    <string name="action_cancel">Отмена</string>
 
     <string name="auth_tagline">Находите собеседников поблизости</string>
     <string name="auth_email">Почта</string>
@@ -59,6 +60,26 @@
     <string name="card_incoming">Хочет пообщаться с вами. Ответить можно во вкладке «Запросы».</string>
     <string name="card_already_chatting">Вы уже общаетесь. Чат — во вкладке «Чаты».</string>
 
+    <string name="requests_empty">Запросов пока нет. Найдите собеседника на карте.</string>
+    <string name="requests_incoming">Входящие</string>
+    <string name="requests_outgoing">Исходящие</string>
+    <string name="requests_accept">Принять</string>
+    <string name="requests_reject">Отклонить</string>
+    <string name="requests_reject_and_block">Отклонить и заблокировать</string>
+    <string name="requests_status_waiting">Ожидает ответа</string>
+    <string name="requests_status_rejected">Запрос отклонён. Повторить можно через %1$d ч</string>
+    <string name="block_reject_title">Отклонить и заблокировать?</string>
+    <string name="block_text">%1$s больше не сможет отправлять вам запросы. Разблокировать можно в профиле, в разделе «Заблокированные».</string>
+    <string name="block_complain">Пожаловаться</string>
+    <string name="block_confirm">Заблокировать</string>
+    <string name="complaint_spam">Спам</string>
+    <string name="complaint_abuse">Оскорбления</string>
+    <string name="complaint_other">Другое</string>
+    <string name="blocked_title">Заблокированные</string>
+    <string name="blocked_empty">Вы никого не заблокировали</string>
+    <string name="blocked_unblock">Разблокировать</string>
+    <string name="profile_blocked">Заблокированные</string>
+
     <string name="ban_title">Аккаунт отстранён</string>
     <string name="ban_until">На вас поступили жалобы. Доступ вернётся %1$s.</string>
     <string name="ban_permanent">На вас неоднократно поступали жалобы. Доступ закрыт навсегда.</string>
@@ -75,5 +96,7 @@
     <string name="error_cooldown">Повторный запрос пока недоступен</string>
     <string name="error_request_unavailable">Запрос этому человеку недоступен</string>
     <string name="error_already_pending">Запрос уже отправлен</string>
+    <string name="error_not_pending">Запрос уже неактуален</string>
+    <string name="error_block_not_available">Блокировка доступна со второго отказа</string>
     <string name="error_age_restricted">Приложение доступно с 18 лет</string>
 </resources>

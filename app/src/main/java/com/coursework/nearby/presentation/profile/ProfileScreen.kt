@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,7 +33,7 @@ import java.time.Year
 /** Вкладка «Профиль»: так пользователя видят другие. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ProfileScreen(profile: Profile, onEdit: () -> Unit, onSignOut: () -> Unit) {
+fun ProfileScreen(profile: Profile, onEdit: () -> Unit, onBlocked: () -> Unit, onSignOut: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -59,6 +60,9 @@ fun ProfileScreen(profile: Profile, onEdit: () -> Unit, onSignOut: () -> Unit) {
         Spacer(Modifier.height(16.dp))
         Button(onClick = onEdit, modifier = Modifier.fillMaxWidth().testTag("editProfile")) {
             Text(stringResource(R.string.profile_edit))
+        }
+        OutlinedButton(onClick = onBlocked, modifier = Modifier.fillMaxWidth().testTag("blocked")) {
+            Text(stringResource(R.string.profile_blocked))
         }
         TextButton(onClick = onSignOut, modifier = Modifier.fillMaxWidth().testTag("signOut")) {
             Text(stringResource(R.string.action_sign_out))

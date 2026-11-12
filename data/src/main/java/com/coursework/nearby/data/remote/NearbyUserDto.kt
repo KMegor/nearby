@@ -5,7 +5,6 @@ import com.coursework.nearby.domain.model.NearbyUser
 import com.coursework.nearby.domain.model.Relation
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.time.OffsetDateTime
 
 @Serializable
 internal data class NearbyUserDto(
@@ -32,7 +31,7 @@ internal data class NearbyUserDto(
         point = GeoPoint(lat, lng),
         relation = Relation.fromCode(relation),
         connectionId = connectionId,
-        retryAt = retryAt?.let { OffsetDateTime.parse(it).toInstant() },
+        retryAt = retryAt?.toInstant(),
         canBlockOnReject = canBlockOnReject,
     )
 }

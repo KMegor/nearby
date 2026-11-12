@@ -21,6 +21,11 @@ import com.coursework.nearby.domain.model.GeoPoint
 import com.coursework.nearby.domain.model.NearbyUser
 import com.coursework.nearby.domain.model.Relation
 import com.coursework.nearby.domain.model.SearchRadius
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withTimeoutOrNull
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -46,6 +51,8 @@ import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
 import org.maplibre.geojson.Polygon
+import java.net.HttpURLConnection
+import java.net.URL
 
 // Бесплатные стили на данных OpenStreetMap, ключ не нужен.
 private const val STYLE_LIGHT = "https://tiles.openfreemap.org/styles/positron"
@@ -88,7 +95,6 @@ fun NearbyMap(
     val dark = isSystemInDarkTheme()
     val currentOnUserClick by rememberUpdatedState(onUserClick)
     var layers by remember { mutableStateOf<MapLayers?>(null) }
-    var usingFallback by remember { mutableStateOf(false) }
 
     val mapView = remember {
         MapLibre.getInstance(context)
@@ -117,21 +123,14 @@ fun NearbyMap(
 
     LaunchedEffect(mapView, dark) {
         layers = null
-        usingFallback = false
+        // Подложку загружаем сами с коротким ожиданием: без сети карта сразу открывается на пустом
+        // фоне, и круг с людьми видны без задержки.
+        val styleJson = fetchStyle(if (dark) STYLE_DARK else STYLE_LIGHT) ?: fallbackStyle(dark)
         mapView.getMapAsync { map ->
             map.uiSettings.isRotateGesturesEnabled = false
             map.uiSettings.isTiltGesturesEnabled = false
             if (map.style == null) map.cameraPosition = CameraPosition.Builder().target(DEFAULT_CENTER).zoom(10.0).build()
-            map.setStyle(if (dark) STYLE_DARK else STYLE_LIGHT) { style ->
-                layers = MapLayers(map, style)
-            }
-            // Без сети подложка не загрузится; круг и люди должны быть видны и на пустом фоне.
-            mapView.addOnDidFailLoadingMapListener {
-                if (layers == null && !usingFallback) {
-                    usingFallback = true
-                    map.setStyle(Style.Builder().fromJson(fallbackStyle(dark))) { style -> layers = MapLayers(map, style) }
-                }
-            }
+            map.setStyle(Style.Builder().fromJson(styleJson)) { style -> layers = MapLayers(map, style) }
             map.addOnMapClickListener { latLng ->
                 val point = map.projection.toScreenLocation(latLng)
                 val touch = RectF(point.x - TOUCH_PX, point.y - TOUCH_PX, point.x + TOUCH_PX, point.y + TOUCH_PX)
@@ -149,6 +148,28 @@ fun NearbyMap(
 }
 
 private const val TOUCH_PX = 36f
+
+private const val STYLE_TIMEOUT_MS = 4_000L
+private val styleScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+/** Описание стиля карты либо null, если сервер подложки недоступен за [STYLE_TIMEOUT_MS]. */
+private suspend fun fetchStyle(url: String): String? {
+    // Запрос идёт в отдельной области: ожидание DNS нельзя прервать, но можно перестать его ждать.
+    val request = styleScope.async {
+        runCatching {
+            (URL(url).openConnection() as HttpURLConnection).run {
+                connectTimeout = STYLE_TIMEOUT_MS.toInt()
+                readTimeout = STYLE_TIMEOUT_MS.toInt()
+                try {
+                    if (responseCode == 200) inputStream.bufferedReader().use { it.readText() } else null
+                } finally {
+                    disconnect()
+                }
+            }
+        }.getOrNull()
+    }
+    return withTimeoutOrNull(STYLE_TIMEOUT_MS) { request.await() }
+}
 
 private fun fallbackStyle(dark: Boolean): String {
     val background = if (dark) "#1D2026" else "#EEF1F6"
